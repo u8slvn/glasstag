@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  defaults:
+    runs-on: ubuntu-latest
+
+  lint:
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Install arduino-lint
+        run: curl -fsSL https://raw.githubusercontent.com/arduino/arduino-lint/main/install.sh | sh
+      - name: Run arduino-lint
+        run: ./bin/arduino-lint --library .
+
+  build:
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Arduino CLI
+        uses: arduino/setup-arduino-cli@v1
+      - name: Install board platform
+        run: arduino-cli core install arduino:avr
+      - name: Compile main sketch
+        run: arduino-cli compile --fqbn arduino:avr:uno src/GlassTag/GlassTag.ino
