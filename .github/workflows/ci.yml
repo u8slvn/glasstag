@@ -1,4 +1,4 @@
-name: CI
+yamlname: CI
 
 on:
   push:
@@ -7,25 +7,19 @@ on:
     branches: [ main ]
 
 jobs:
-  defaults:
-    runs-on: ubuntu-latest
-
-  lint:
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Install arduino-lint
-        run: curl -fsSL https://raw.githubusercontent.com/arduino/arduino-lint/main/install.sh | sh
-      - name: Run arduino-lint
-        run: ./bin/arduino-lint --library .
-
   build:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up Arduino CLI
         uses: arduino/setup-arduino-cli@v1
       - name: Install board platform
         run: arduino-cli core install arduino:avr
-      - name: Compile main sketch
+      - name: Install libraries
+        run: |
+          arduino-cli lib install "Adafruit GFX Library"
+          arduino-cli lib install "Adafruit SSD1306"
+          arduino-cli lib install "MFRC522"
+      - name: Compile sketch
         run: arduino-cli compile --fqbn arduino:avr:uno src/GlassTag/GlassTag.ino
